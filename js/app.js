@@ -5,11 +5,67 @@ var incompleteTasksHolder = document.getElementById("incomplete-tasks");  // Inc
 var completedTasksHolder = document.getElementById("completed-tasks");    // Completed-tasks
 
 // Filter and Stats Elements
-var filterButtons = document.querySelectorAll(".filter-btn");
-var totalTasksElement = document.querySelector(".total-tasks");
-var completedTasksElement = document.querySelector(".completed-tasks");
-var clearCompletedButton = document.querySelector(".clear-completed");
-var currentFilter = "all"; // Default filter
+var filterButtons, totalTasksElement, completedTasksElement, clearCompletedButton, currentFilter;
+
+// Initialize elements after DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+  filterButtons = document.querySelectorAll(".filter-btn");
+  totalTasksElement = document.querySelector(".total-tasks");
+  completedTasksElement = document.querySelector(".completed-tasks");
+  clearCompletedButton = document.querySelector(".clear-completed");
+  currentFilter = "all"; // Default filter
+});
+
+// localStorage data structure
+var STORAGE_KEY = "todo-list-data";
+
+// Save data to localStorage
+var saveData = function() {
+  var data = {
+    incompleteTasks: [],
+    completedTasks: []
+  };
+  
+  // Save incomplete tasks
+  for(var i = 0; i < incompleteTasksHolder.children.length; i++) {
+    var li = incompleteTasksHolder.children[i];
+    var label = li.querySelector("label");
+    data.incompleteTasks.push(label.innerText);
+  }
+  
+  // Save completed tasks
+  for(var i = 0; i < completedTasksHolder.children.length; i++) {
+    var li = completedTasksHolder.children[i];
+    var label = li.querySelector("label");
+    data.completedTasks.push(label.innerText);
+  }
+  
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+};
+
+// Load data from localStorage
+var loadData = function() {
+  var data = localStorage.getItem(STORAGE_KEY);
+  if(data) {
+    data = JSON.parse(data);
+    
+    // Load incomplete tasks
+    data.incompleteTasks.forEach(function(taskText) {
+      var listItem = createNewTaskElement(taskText);
+      incompleteTasksHolder.appendChild(listItem);
+      bindTaskEvents(listItem, taskCompleted);
+    });
+    
+    // Load completed tasks
+    data.completedTasks.forEach(function(taskText) {
+      var listItem = createNewTaskElement(taskText);
+      var checkBox = listItem.querySelector("input[type=checkbox]");
+      checkBox.checked = true;
+      completedTasksHolder.appendChild(listItem);
+      bindTaskEvents(listItem, taskIncomplete);
+    });
+  }
+};
 
 var createNewTaskElement = function(taskString) {       // New Task List Item
   var listItem = document.createElement("li");          // Create List Item
@@ -54,6 +110,7 @@ var editTask = function() {                                     // Edit an exist
   if(containsClass) {                                           // Switch from .editMode
       label.innerText = editInput.value;                        // Label text become the input's value
       button.innerText = "Edit";                                // Buttons name modified to Edit
+      saveData(); // Save after editing
   } else {                                                      // Switch to .editMode
      editInput.value = label.innerText;                         // Input value becomes the label's text
      button.innerText = "Save";                                 // Button name modified to Save
@@ -144,42 +201,52 @@ var clearCompleted = function() {
     completedTasksHolder.removeChild(completedTasksHolder.firstChild);
   }
   updateStats();
+  saveData();
 };
 
 // Event listeners
-filterButtons.forEach(function(button) {
-  button.addEventListener("click", function() {
-    var filter = this.getAttribute("data-filter");
-    filterTasks(filter);
+document.addEventListener('DOMContentLoaded', function() {
+  filterButtons.forEach(function(button) {
+    button.addEventListener("click", function() {
+      var filter = this.getAttribute("data-filter");
+      filterTasks(filter);
+    });
   });
+
+  clearCompletedButton.addEventListener("click", clearCompleted);
 });
-
-clearCompletedButton.addEventListener("click", clearCompleted);
-
-// Update stats on load
-updateStats();
 
 // Update stats when tasks are added, removed, or completed
 var originalAddTask = addTask;
 addTask = function() {
   originalAddTask();
   updateStats();
+  saveData();
 };
 
 var originalDeleteTask = deleteTask;
 deleteTask = function() {
   originalDeleteTask.apply(this, arguments);
   updateStats();
+  saveData();
 };
 
 var originalTaskCompleted = taskCompleted;
 taskCompleted = function() {
   originalTaskCompleted.apply(this, arguments);
   updateStats();
+  saveData();
 };
 
 var originalTaskIncomplete = taskIncomplete;
 taskIncomplete = function() {
   originalTaskIncomplete.apply(this, arguments);
   updateStats();
+  saveData();
 };
+
+// Load data from localStorage and update stats on page load
+document.addEventListener('DOMContentLoaded', function() {
+  loadData();
+  updateStats();
+});
