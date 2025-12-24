@@ -4,6 +4,13 @@ var addButton = document.getElementsByTagName("button")[0];               // Fir
 var incompleteTasksHolder = document.getElementById("incomplete-tasks");  // Incomplete-tasks
 var completedTasksHolder = document.getElementById("completed-tasks");    // Completed-tasks
 
+// Filter and Stats Elements
+var filterButtons = document.querySelectorAll(".filter-btn");
+var totalTasksElement = document.querySelector(".total-tasks");
+var completedTasksElement = document.querySelector(".completed-tasks");
+var clearCompletedButton = document.querySelector(".clear-completed");
+var currentFilter = "all"; // Default filter
+
 var createNewTaskElement = function(taskString) {       // New Task List Item
   var listItem = document.createElement("li");          // Create List Item
   var checkBox = document.createElement("input");       // Input (checkbox)
@@ -95,3 +102,84 @@ for(var i = 0; i < incompleteTasksHolder.children.length; i++) {     // Cycle ov
 for(var i = 0; i < completedTasksHolder.children.length; i++) {      // Cycle over completedTasksHolder ul list items
   bindTaskEvents(completedTasksHolder.children[i], taskIncomplete);   // Bind events to list item's children (taskIncomplete)
 }
+
+// Update stats
+var updateStats = function() {
+  var total = incompleteTasksHolder.children.length + completedTasksHolder.children.length;
+  var completed = completedTasksHolder.children.length;
+  var active = incompleteTasksHolder.children.length;
+  
+  totalTasksElement.textContent = total + " tasks";
+  completedTasksElement.textContent = completed + " completed";
+};
+
+// Filter tasks
+var filterTasks = function(filter) {
+  currentFilter = filter;
+  
+  // Update button active state
+  filterButtons.forEach(function(button) {
+    button.classList.remove("active");
+    if(button.getAttribute("data-filter") === filter) {
+      button.classList.add("active");
+    }
+  });
+  
+  // Show/hide task lists based on filter
+  if(filter === "all") {
+    incompleteTasksHolder.style.display = "block";
+    completedTasksHolder.style.display = "block";
+  } else if(filter === "active") {
+    incompleteTasksHolder.style.display = "block";
+    completedTasksHolder.style.display = "none";
+  } else if(filter === "completed") {
+    incompleteTasksHolder.style.display = "none";
+    completedTasksHolder.style.display = "block";
+  }
+};
+
+// Clear completed tasks
+var clearCompleted = function() {
+  while(completedTasksHolder.firstChild) {
+    completedTasksHolder.removeChild(completedTasksHolder.firstChild);
+  }
+  updateStats();
+};
+
+// Event listeners
+filterButtons.forEach(function(button) {
+  button.addEventListener("click", function() {
+    var filter = this.getAttribute("data-filter");
+    filterTasks(filter);
+  });
+});
+
+clearCompletedButton.addEventListener("click", clearCompleted);
+
+// Update stats on load
+updateStats();
+
+// Update stats when tasks are added, removed, or completed
+var originalAddTask = addTask;
+addTask = function() {
+  originalAddTask();
+  updateStats();
+};
+
+var originalDeleteTask = deleteTask;
+deleteTask = function() {
+  originalDeleteTask.apply(this, arguments);
+  updateStats();
+};
+
+var originalTaskCompleted = taskCompleted;
+taskCompleted = function() {
+  originalTaskCompleted.apply(this, arguments);
+  updateStats();
+};
+
+var originalTaskIncomplete = taskIncomplete;
+taskIncomplete = function() {
+  originalTaskIncomplete.apply(this, arguments);
+  updateStats();
+};

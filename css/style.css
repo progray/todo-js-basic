@@ -36,6 +36,95 @@ button {
 button:hover {
   color: #333;
 }
+
+/* Filter Panel */
+.filter-panel {
+  margin: 20px 0;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.filter-btn {
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #fff;
+  color: #888;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-btn:hover {
+  border-color: #0FC57C;
+  color: #0FC57C;
+}
+
+.filter-btn.active {
+  background: #0FC57C;
+  color: #fff;
+  border-color: #0FC57C;
+}
+
+/* Stats Panel */
+.stats-panel {
+  margin: 20px 0;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.stats-panel span {
+  color: #888;
+  font-size: 14px;
+}
+
+.clear-completed {
+  padding: 8px 16px;
+  border: 1px solid #CF2323;
+  border-radius: 4px;
+  background: #fff;
+  color: #CF2323;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.clear-completed:hover {
+  background: #CF2323;
+  color: #fff;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  .container {
+    width: 90%;
+  }
+  
+  .filter-panel {
+    flex-direction: column;
+  }
+  
+  .filter-btn {
+    width: 100%;
+  }
+  
+  .stats-panel {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .clear-completed {
+    width: 100%;
+  }
+}
 /* Heading */
 h3,
 label[for='new-task'] {

@@ -11,6 +11,20 @@
         <label for="new-task">Add Item</label><input id="new-task" type="text"><button>Add</button>
       </p>
       
+      <!-- 过滤面板 -->
+      <div class="filter-panel">
+        <button class="filter-btn active" data-filter="all">全部</button>
+        <button class="filter-btn" data-filter="active">进行中</button>
+        <button class="filter-btn" data-filter="completed">已完成</button>
+      </div>
+      
+      <!-- 统计区域 -->
+      <div class="stats-panel">
+        <span class="total-tasks">0 tasks</span>
+        <span class="completed-tasks">0 completed</span>
+        <button class="clear-completed">清除已完成</button>
+      </div>
+      
       <h3>Todo</h3>
       <ul id="incomplete-tasks">
         <li><input type="checkbox"><label>Pay Bills</label><input type="text"><button class="edit">Edit</button><button class="delete">Delete</button></li>
